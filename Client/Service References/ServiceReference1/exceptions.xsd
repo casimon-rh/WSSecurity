@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="http://interacciones.com/corp/exception/v2_0/schemas" elementFormDefault="qualified" targetNamespace="http://interacciones.com/corp/exception/v2_0/schemas" jaxb:version="1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:complexType name="gfiWsdlExceptionType" abstract="true">
+    <xsd:annotation>
+      <xsd:documentation> 
+				Excepcion general para GFI, la cual define la informacion que contendran todas las excepciones que la hereden.
+				Toda excepcion debera de extender de esta con el fin de estandarizar las respuestas de todas las excepciones. 
+			</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" name="status" type="xsd:int" />
+      <xsd:element maxOccurs="unbounded" name="description" type="xsd:string" />
+      <xsd:element maxOccurs="1" name="stacktrace" type="xsd:string" />
+      <xsd:element maxOccurs="1" name="className" type="xsd:string" />
+      <xsd:element maxOccurs="1" name="message" type="xsd:string" />
+      <xsd:element maxOccurs="1" name="info" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="errorDetailType">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" name="errId" type="xsd:string" />
+      <xsd:element maxOccurs="1" name="errMsg" type="xsd:string" />
+      <xsd:element maxOccurs="1" name="errDetail" type="xsd:string" />
+      <xsd:element maxOccurs="unbounded" name="details" type="tns:errorDetailType" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="operationFailedWsdlExceptionType">
+    <xsd:annotation>
+      <xsd:documentation> Define una excepcion causado por un comportamiento "desconocido" o no esperado</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="false">
+      <xsd:extension base="tns:gfiWsdlExceptionType">
+        <xsd:sequence>
+          <xsd:element maxOccurs="1" name="erroneo" type="xsd:anyType" />
+          <xsd:element maxOccurs="1" name="completo" type="xsd:anyType" />
+          <xsd:element maxOccurs="unbounded" name="errorDetails" type="tns:errorDetailType" />
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="incompleteOperationWsdlExceptionType">
+    <xsd:annotation>
+      <xsd:documentation> Define una excepcion causada por un error interno en alguna de las partes del servicio, pero establece que una parte del proceso se realizo</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="false">
+      <xsd:extension base="tns:operationFailedWsdlExceptionType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="validationWsdlExceptionType">
+    <xsd:annotation>
+      <xsd:documentation> Excepcion que define un error en la validacion de datos (Error en rango de fechas, caracteres invalidaos ... etc)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="false">
+      <xsd:extension base="tns:operationFailedWsdlExceptionType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="incompleteDataWsdlExceptionType">
+    <xsd:annotation>
+      <xsd:documentation> Excepcion que especifica faltantes en la informacion requerida</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="false">
+      <xsd:extension base="tns:operationFailedWsdlExceptionType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="duplicatedDataWsdlExceptionType">
+    <xsd:annotation>
+      <xsd:documentation> Especifica que se esta intentando duplicar informacion</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="false">
+      <xsd:extension base="tns:gfiWsdlExceptionType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="noDataFoundWsdlExceptionType">
+    <xsd:annotation>
+      <xsd:documentation> Especifica que no se ha encontrado la informacion solicitada</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="false">
+      <xsd:extension base="tns:gfiWsdlExceptionType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="noAuthorizationWsdlExceptionType">
+    <xsd:annotation>
+      <xsd:documentation> Especifica el motivo por el cual no se ha autoriado el proceso solicitado</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent mixed="false">
+      <xsd:extension base="tns:operationFailedWsdlExceptionType" />
+    </xsd:complexContent>
+  </xsd:complexType>
+</xsd:schema>

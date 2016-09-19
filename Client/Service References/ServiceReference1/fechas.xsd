@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:tns="http://interacciones.com/corp/fechas/v1_0/schemas" targetNamespace="http://interacciones.com/corp/fechas/v1_0/schemas" jaxb:version="1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:annotation>
+    <xsd:appinfo>
+      <jaxb:globalBindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb">
+        <jaxb:javaType name="java.util.Date" xmlType="xsd:dateTime" parseMethod="com.gfi.corp.utils.XsdDateTimeConverter.unmarshal" printMethod="com.gfi.corp.utils.XsdDateTimeConverter.marshalDateTime" />
+        <jaxb:javaType name="java.util.Date" xmlType="xsd:date" parseMethod="com.gfi.corp.utils.XsdDateTimeConverter.unmarshal" printMethod="com.gfi.corp.utils.XsdDateTimeConverter.marshalDate" />
+      </jaxb:globalBindings>
+    </xsd:appinfo>
+  </xsd:annotation>
+  <xsd:complexType name="ConsultaFechaEmpresaType">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" name="idEmpresa" type="xsd:int" />
+      <xsd:element maxOccurs="1" name="cveDiaLiquida" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

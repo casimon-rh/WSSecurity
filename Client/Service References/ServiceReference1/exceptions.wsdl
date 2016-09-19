@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/wsdl/encoding/" xmlns:tns="http://interacciones.com/corp/exception/v2_0/definitions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tipos="http://interacciones.com/corp/exception/v2_0/schemas" targetNamespace="http://interacciones.com/corp/exception/v2_0/definitions" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema xmlns:excep="http://interacciones.com/corp/exception/v2_0/schemas" xmlns:tns="http://interacciones.com/corp/exception/v2_0/schemas" targetNamespace="http://interacciones.com/corp/exception/v2_0/schemas">
+      <xsd:include schemaLocation="exceptions.xsd" />
+      <xsd:element name="operationFailedWsdlExceptionInfo" type="tns:operationFailedWsdlExceptionType" />
+      <xsd:element name="validationWsdlExceptionInfo" type="tns:validationWsdlExceptionType" />
+      <xsd:element name="incompleteDataWsdlExceptionInfo" type="tns:incompleteDataWsdlExceptionType" />
+      <xsd:element name="duplicatedDataWsdlExceptionInfo" type="tns:duplicatedDataWsdlExceptionType" />
+      <xsd:element name="noDataFoundWsdlExceptionInfo" type="tns:noDataFoundWsdlExceptionType" />
+      <xsd:element name="incompleteOperationWsdlExceptionInfo" type="tns:incompleteOperationWsdlExceptionType" />
+      <xsd:element name="noAuthorizationWsdlExceptionInfo" type="tns:noAuthorizationWsdlExceptionType" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="noDataFoundWsdlException">
+    <wsdl:part name="exception" element="tipos:noDataFoundWsdlExceptionInfo" />
+  </wsdl:message>
+  <wsdl:message name="noAuthorizationWsdlException">
+    <wsdl:part name="exception" element="tipos:noAuthorizationWsdlExceptionInfo" />
+  </wsdl:message>
+  <wsdl:message name="incompleteDataWsdlException">
+    <wsdl:part name="exception" element="tipos:incompleteDataWsdlExceptionInfo" />
+  </wsdl:message>
+  <wsdl:message name="duplicatedDataWsdlException">
+    <wsdl:part name="exception" element="tipos:duplicatedDataWsdlExceptionInfo" />
+  </wsdl:message>
+  <wsdl:message name="operationFailedWsdlException">
+    <wsdl:part name="exception" element="tipos:operationFailedWsdlExceptionInfo" />
+  </wsdl:message>
+  <wsdl:message name="validationWsdlException">
+    <wsdl:part name="exception" element="tipos:validationWsdlExceptionInfo" />
+  </wsdl:message>
+  <wsdl:message name="incompleteOperationWsdlException">
+    <wsdl:part name="exception" element="tipos:incompleteOperationWsdlExceptionInfo" />
+  </wsdl:message>
+</wsdl:definitions>

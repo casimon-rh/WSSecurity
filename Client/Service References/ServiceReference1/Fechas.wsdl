@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/wsdl/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://interacciones.com/corp/fechas/v1_0/definitions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tipos="http://interacciones.com/corp/fechas/v1_0/schemas" xmlns:excep="http://interacciones.com/corp/exception/v2_0/definitions" name="Fechas" targetNamespace="http://interacciones.com/corp/fechas/v1_0/definitions" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:import namespace="http://interacciones.com/corp/exception/v2_0/definitions" location="exceptions.wsdl" />
+  <wsdl:types>
+    <xsd:schema xmlns:tns="http://interacciones.com/corp/fechas/v1_0/schemas" attributeFormDefault="qualified" elementFormDefault="unqualified" targetNamespace="http://interacciones.com/corp/fechas/v1_0/schemas">
+      <xsd:include schemaLocation="fechas.xsd" />
+      <xsd:element name="consultaFechaEmpresaRequest" type="tns:ConsultaFechaEmpresaType" />
+      <xsd:element name="consultaFechaEmpresaResponse" type="xsd:date" />
+      <xsd:element name="consultaFechaHoraBDRequest" type="xsd:string" />
+      <xsd:element name="consultaFechaHoraBDResponse" type="xsd:dateTime" />
+      <xsd:element name="formatoFechaRequest" type="xsd:date" />
+      <xsd:element name="formatoFechaResponse" type="xsd:string" />
+      <xsd:element name="formatoFechaHMRequest" type="xsd:date" />
+      <xsd:element name="formatoFechaHMResponse" type="xsd:string" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="consultaFechaEmpresaRequest">
+    <wsdl:part name="consultaFechaEmpresaRq" element="tipos:consultaFechaEmpresaRequest" />
+  </wsdl:message>
+  <wsdl:message name="consultaFechaEmpresaResponse">
+    <wsdl:part name="consultaFechaEmpresaRs" element="tipos:consultaFechaEmpresaResponse" />
+  </wsdl:message>
+  <wsdl:message name="consultaFechaHoraBDRequest">
+    <wsdl:part name="consultaFechaHoraBDRq" element="tipos:consultaFechaHoraBDRequest" />
+  </wsdl:message>
+  <wsdl:message name="consultaFechaHoraBDResponse">
+    <wsdl:part name="consultaFechaHoraBDRs" element="tipos:consultaFechaHoraBDResponse" />
+  </wsdl:message>
+  <wsdl:message name="formatoFechaRequest">
+    <wsdl:part name="formatoFechaRq" element="tipos:formatoFechaRequest" />
+  </wsdl:message>
+  <wsdl:message name="formatoFechaResponse">
+    <wsdl:part name="formatoFechaRs" element="tipos:formatoFechaResponse" />
+  </wsdl:message>
+  <wsdl:message name="formatoFechaHMRequest">
+    <wsdl:part name="formatoFechaHMRq" element="tipos:formatoFechaHMRequest" />
+  </wsdl:message>
+  <wsdl:message name="formatoFechaHMResponse">
+    <wsdl:part name="formatoFechaHMRs" element="tipos:formatoFechaHMResponse" />
+  </wsdl:message>
+  <wsdl:portType name="FechasPortType">
+    <wsdl:operation name="consultarFechaEmpresa">
+      <wsdl:documentation>Capacidad para consultar la fecha empresa</wsdl:documentation>
+      <wsdl:input message="tns:consultaFechaEmpresaRequest" />
+      <wsdl:output message="tns:consultaFechaEmpresaResponse" />
+      <wsdl:fault name="incompleteDataWsdlException" message="excep:incompleteDataWsdlException" />
+      <wsdl:fault name="operationFailedWsdlException" message="excep:operationFailedWsdlException" />
+    </wsdl:operation>
+    <wsdl:operation name="consultarFechaHoraBD">
+      <wsdl:documentation>Capacidad para consultar la fecha y hora de la B.D.</wsdl:documentation>
+      <wsdl:input message="tns:consultaFechaHoraBDRequest" />
+      <wsdl:output message="tns:consultaFechaHoraBDResponse" />
+      <wsdl:fault name="operationFailedWsdlException" message="excep:operationFailedWsdlException" />
+    </wsdl:operation>
+    <wsdl:operation name="obtenerFormatoFecha">
+      <wsdl:documentation>Da formato a una fecha tipo date sin Hora y minutos</wsdl:documentation>
+      <wsdl:input message="tns:formatoFechaRequest" />
+      <wsdl:output message="tns:formatoFechaResponse" />
+      <wsdl:fault name="validationWsdlException" message="excep:validationWsdlException" />
+      <wsdl:fault name="operationFailedWsdlException" message="excep:operationFailedWsdlException" />
+    </wsdl:operation>
+    <wsdl:operation name="obtenerFormatoFechaHM">
+      <wsdl:documentation>Da formato a una fecha tipo date con Hora y minutos</wsdl:documentation>
+      <wsdl:input message="tns:formatoFechaHMRequest" />
+      <wsdl:output message="tns:formatoFechaHMResponse" />
+      <wsdl:fault name="validationWsdlException" message="excep:validationWsdlException" />
+      <wsdl:fault name="operationFailedWsdlException" message="excep:operationFailedWsdlException" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>
