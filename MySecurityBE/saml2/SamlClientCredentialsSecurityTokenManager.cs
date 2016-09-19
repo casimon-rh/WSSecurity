@@ -12,11 +12,11 @@ namespace MySecurityBE.Saml2
 {
 
     //A REVISAR https://msdn.microsoft.com/en-us/library/aa355062(v=vs.110).aspx
-    public class CreditCardClientCredentialsSecurityTokenManager : ClientCredentialsSecurityTokenManager
+    public class SamlAssertiondClientCredentialsSecurityTokenManager : ClientCredentialsSecurityTokenManager
     {
         SamlAssertionClientCredentials samlAssertionClientCredentials;
 
-        public CreditCardClientCredentialsSecurityTokenManager(SamlAssertionClientCredentials creditCardClientCredentials)
+        public SamlAssertiondClientCredentialsSecurityTokenManager(SamlAssertionClientCredentials creditCardClientCredentials)
             : base(creditCardClientCredentials)
         {
             this.samlAssertionClientCredentials = creditCardClientCredentials;

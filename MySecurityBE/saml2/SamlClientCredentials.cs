@@ -35,7 +35,7 @@ namespace MySecurityBE.Saml2
 
         public override SecurityTokenManager CreateSecurityTokenManager()
         {
-            return new CreditCardClientCredentialsSecurityTokenManager(this);
+            return new SamlAssertiondClientCredentialsSecurityTokenManager(this);
         }
     }
 }

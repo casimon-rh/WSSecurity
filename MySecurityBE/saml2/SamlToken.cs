@@ -15,7 +15,7 @@ namespace MySecurityBE.Saml2
         string id;
         ReadOnlyCollection<SecurityKey> securityKeys;
 
-        public SamlToken(SamlAssertionInfo samlAssertionInfo) : this(samlAssertionInfo, Guid.NewGuid().ToString()) { }
+        public SamlToken(SamlAssertionInfo samlAssertionInfo) : this(samlAssertionInfo, "_SAML_2") { }
 
         public SamlToken(SamlAssertionInfo samlAssertionInfo, string id)
         {

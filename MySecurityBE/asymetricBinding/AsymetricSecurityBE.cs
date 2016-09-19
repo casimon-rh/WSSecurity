@@ -34,7 +34,7 @@ namespace MySecurityBE.Binding
                 X509ReferenceStyle = X509KeyIdentifierClauseType.IssuerSerial
             };
             m_asymSecBE.DefaultAlgorithmSuite = SecurityAlgorithmSuite.Basic128;
-            m_asymSecBE.MessageProtectionOrder = MessageProtectionOrder.SignBeforeEncryptAndEncryptSignature;
+            m_asymSecBE.MessageProtectionOrder = MessageProtectionOrder.SignBeforeEncrypt;
             m_asymSecBE.SetKeyDerivation(false);
 
             m_asymSecBE.AllowSerializedSigningTokenOnReply = false;

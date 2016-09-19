@@ -33,7 +33,7 @@ namespace MySecurityBE.Saml2
 
         protected override bool HasAsymmetricKey
         {
-            get { return true; }
+            get { return false; }
         }
 
         protected override bool SupportsClientAuthentication

@@ -79,6 +79,7 @@ namespace MySecurityBE.Saml2
             if (c != null)
             {
                 //Saml-----------------------------------
+                c.SamlAssertionInfo.SamlAssertion.Id = token.Id;
                 XmlElement assertion = c.SamlAssertionInfo.SamlAssertion.GetXml();
                 assertion.WriteTo(writer);
                 CorrioSaml = true;
