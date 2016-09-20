@@ -48,7 +48,7 @@ namespace MySecurityBE.Saml2
             }
             else
             {
-                return WSSecurityTokenSerializer.DefaultInstance.ReadToken(reader, tokenResolver);
+                return base.ReadTokenCore(reader, tokenResolver);
             }
         }
 

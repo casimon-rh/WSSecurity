@@ -72,6 +72,7 @@
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -81,6 +82,12 @@
     <Compile Include="asymetricBinding\AsymetricSecurityBE.cs" />
     <Compile Include="cifrados\ICifrado.cs" />
     <Compile Include="cifrados\impl\AES128Manejador.cs" />
+    <Compile Include="enconding\CertRefEncoder.cs" />
+    <Compile Include="enconding\CertRefEncoderFactory.cs" />
+    <Compile Include="enconding\CertRefEncodingBindingElement.cs" />
+    <Compile Include="enconding\ModifiedSecurityHeader.cs" />
+    <Compile Include="enconding\SignedXmlWithId .cs" />
+    <Compile Include="enconding\SimpleMessageBody.cs" />
     <Compile Include="saml2\SamlClientCredentials.cs" />
     <Compile Include="saml2\SamlClientCredentialsSecurityTokenManager.cs" />
     <Compile Include="saml2\SamlSecurityTokenSerializer .cs" />

@@ -16,14 +16,14 @@ using System.Security.Cryptography;
 using System.IO;
 using MySecurityBE.Binding;
 using MySecurityBE.Saml2;
+using System.ServiceModel.Security;
 
 namespace Client
 {
     public partial class WindowsClient : Form
     {
-#error Especificar la ubicación de los certificados
-        static X509Certificate2 privateCer = new X509Certificate2(@"Ruta .p12 o pfx", "Contraseña");
-        static X509Certificate2 publicCer = new X509Certificate2(@"Ruta .cer");
+        #error Especificar la ubicación de los certificados
+        static X509Certificate2 privateCer = new X509Certificate2(@".p12", "");
         public WindowsClient()
         {
             InitializeComponent();
@@ -49,7 +49,7 @@ namespace Client
             assertion.Id = "_" + Guid.NewGuid().ToString();
             assertion.IssueInstant = DateTime.UtcNow;
             #error Especificar issuer
-            assertion.Issuer = new Issuer("www.example.com.mx", null, null, SamlNameIdentifierFormat.Entity, null);
+            assertion.Issuer = new Issuer("www.example.mx", null, null, SamlNameIdentifierFormat.Entity, null);
             assertion.Conditions = new Conditions(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
             assertion.Subject = new Subject(new NameId("DEAA9255")
             {
@@ -78,9 +78,8 @@ namespace Client
 
         private void cmdGo_Click(object sender, EventArgs e)
         {
-#error especificar url del endpoint
-            EndpointAddress adress =
-                new EndpointAddress(new Uri("http://192.168.0.1/testService"), EndpointIdentity.CreateDnsIdentity("jasper2"));
+            #error especificar url del endpoint
+            EndpointAddress adress = new EndpointAddress(new Uri("http://localhost"), EndpointIdentity.CreateDnsIdentity("jasper2"));
             var factory = new ChannelFactory<FechasPortType>("BindingOSB", adress);
 
             SamlAssertionClientCredentials saml = new SamlAssertionClientCredentials(new SamlAssertionInfo(CreateAssertion()));
@@ -90,11 +89,23 @@ namespace Client
 
             factory.Credentials.SupportInteractive = false;
             factory.Credentials.ClientCertificate.Certificate = privateCer;
-            factory.Credentials.ServiceCertificate.DefaultCertificate = publicCer;
+            factory.Credentials.ServiceCertificate.DefaultCertificate = privateCer;
+            factory.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.None;
+            factory.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
 
-            var proxy = factory.CreateChannel();
-            var ret = proxy.consultarFechaHoraBD(new consultarFechaHoraBDRequest(""));
-            txtRet.Text = ret.consultaFechaHoraBDResponse.ToString();
+
+            try
+            {
+                var proxy = factory.CreateChannel();
+                var ret = proxy.consultarFechaHoraBD(new consultarFechaHoraBDRequest(""));
+                txtRet.Text = ret.consultaFechaHoraBDResponse.ToString();
+
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.Message);
+            }
 
 
         }

@@ -76,62 +76,12 @@ namespace MySecurityBE.Binding
             return Message.CreateMessage(reader, maxSizeOfHeaders, MessageVersion);
         }
 
-
-        public XmlWriter WriteStamp(StringWriter sw)
-        {
-
-            XmlWriterSettings xws = new XmlWriterSettings();
-            xws.OmitXmlDeclaration = true;
-            xws.Encoding = Encoding.UTF8;
-            XmlWriter _writer = XmlWriter.Create(sw, xws);
-
-            _writer.WriteStartElement(strwssu, "TimeStamp", strwssens);
-            {
-                // <wsu:Timestamp>
-                string guid = Guid.NewGuid().ToString();
-                _writer.WriteAttributeString("wsu", "Id", null, "TS-" + guid);
-                //<wsu:Created>
-                _writer.WriteStartElement(strwssu, "Created", strwssens);
-                {
-                    _writer.WriteString(string.Format("{0}", DateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'")));
-                }
-                _writer.WriteEndElement();
-
-                //<wsu:Expires>
-                _writer.WriteStartElement(strwssu, "Expires", strwssens);
-                {
-                    _writer.WriteString(string.Format("{0}", DateTime.Now.AddMinutes(1).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'")));
-                }
-                _writer.WriteEndElement();
-            }
-            _writer.WriteEndElement();
-            _writer.Flush();
-            return _writer;
-
-        }
-
         public override ArraySegment<byte> WriteMessage(Message message, int maxMessageSize, BufferManager bufferManager, int messageOffset)
         {
             MemoryStream stream = new MemoryStream();
-
-
             XmlWriter writer = XmlWriter.Create(stream, this.writerSettings);
-
-
-
-
             message.WriteMessage(writer);
             writer.Close();
-
-            // get the persisted SAML Assertion and add to the stream representation of the message
-            stream.Position = 0;
-            XElement xmlMessage = XElement.Load(stream);
-
-            XNamespace sec = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-            var secA = xmlMessage.Descendants(sec + "Security");
-
-
-
 
             byte[] messageBytes = stream.GetBuffer();
             int messageLength = (int)stream.Position;

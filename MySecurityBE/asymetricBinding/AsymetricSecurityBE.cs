@@ -18,8 +18,12 @@ namespace MySecurityBE.Binding
         private AsymmetricSecurityBindingElement m_asymSecBE;
         public AsymetricSecurityBE()
         {
-            m_asymSecBE = new AsymmetricSecurityBindingElement();
+            m_asymSecBE = SecurityBindingElement.CreateMutualCertificateDuplexBindingElement();
+
+
             m_asymSecBE.MessageSecurityVersion = MessageSecurityVersion.WSSecurity11WSTrustFebruary2005WSSecureConversationFebruary2005WSSecurityPolicy11BasicSecurityProfile10;
+
+
             m_asymSecBE.IncludeTimestamp = true;
 
             m_asymSecBE.SecurityHeaderLayout = SecurityHeaderLayout.Lax;
@@ -27,6 +31,7 @@ namespace MySecurityBE.Binding
             m_asymSecBE.InitiatorTokenParameters = new X509SecurityTokenParameters()
             {
                 InclusionMode = SecurityTokenInclusionMode.AlwaysToInitiator
+
             };
             m_asymSecBE.RecipientTokenParameters = new X509SecurityTokenParameters()
             {
@@ -37,8 +42,8 @@ namespace MySecurityBE.Binding
             m_asymSecBE.MessageProtectionOrder = MessageProtectionOrder.SignBeforeEncrypt;
             m_asymSecBE.SetKeyDerivation(false);
 
-            m_asymSecBE.AllowSerializedSigningTokenOnReply = false;
-            m_asymSecBE.RequireSignatureConfirmation = false;
+            m_asymSecBE.AllowSerializedSigningTokenOnReply = true;
+            m_asymSecBE.RequireSignatureConfirmation = true;
             m_asymSecBE.EndpointSupportingTokenParameters.SignedEncrypted.Add(new SamlAssertionTokenParameters());
             m_asymSecBE.ProtectTokens = true;
 

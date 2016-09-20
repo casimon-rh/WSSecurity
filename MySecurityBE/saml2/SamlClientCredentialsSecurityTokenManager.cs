@@ -4,6 +4,7 @@ using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
 using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.ServiceModel.Security.Tokens;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,7 +33,30 @@ namespace MySecurityBE.Saml2
             {
                 if (tokenRequirement.TokenType == SecurityTokenTypes.X509Certificate)
                 {
-                    return new X509SecurityTokenProvider(samlAssertionClientCredentials.ServiceCertificate.DefaultCertificate);
+                    MessageDirection direction = tokenRequirement.GetProperty<MessageDirection>(ServiceModelSecurityTokenRequirement.MessageDirectionProperty);
+                    if (direction == MessageDirection.Output)
+                    {
+
+                        if (tokenRequirement.KeyUsage == SecurityKeyUsage.Signature)
+                            return new X509SecurityTokenProvider(samlAssertionClientCredentials.ServiceCertificate.DefaultCertificate);
+                        else
+                            return new X509SecurityTokenProvider(samlAssertionClientCredentials.ClientCertificate.Certificate);
+                    }
+                }
+            }
+            else if (tokenRequirement is RecipientServiceModelSecurityTokenRequirement)
+            {
+                if (tokenRequirement.TokenType == SecurityTokenTypes.X509Certificate)
+                {
+                    MessageDirection direction = tokenRequirement.GetProperty<MessageDirection>(ServiceModelSecurityTokenRequirement.MessageDirectionProperty);
+                    if (direction == MessageDirection.Input)
+                    {
+
+                        if (tokenRequirement.KeyUsage == SecurityKeyUsage.Signature)
+                            return new X509SecurityTokenProvider(samlAssertionClientCredentials.ServiceCertificate.DefaultCertificate);
+                        else
+                            return new X509SecurityTokenProvider(samlAssertionClientCredentials.ClientCertificate.Certificate);
+                    }
                 }
             }
             return base.CreateSecurityTokenProvider(tokenRequirement);
