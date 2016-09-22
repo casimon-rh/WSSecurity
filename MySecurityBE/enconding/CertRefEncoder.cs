@@ -22,34 +22,45 @@ namespace CertFixEscapedComma
         private const string SECURITY_NAMESPACE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
         private const string SECURITY_UTILITY_NAMESPACE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
 
-        private MessageEncoder innerEncoder;
+        public MessageEncoder innerEncoder { get; set; }
         private XmlWriterSettings writerSettings;
 
+        #region Spring
+        public X509Certificate2 certificado { get; set; }
+        public Dictionary<string, string> namespaces { get; set; }
+        public ICifrado<byte[]> cypher { get; set; }
+        #endregion
 
         public CertRefEncoder(MessageEncoder innerEnc)
         {
-            this.innerEncoder = innerEnc;
+            innerEncoder = innerEnc;
 
-            this.writerSettings = new XmlWriterSettings();
-            this.writerSettings.Encoding = Encoding.UTF8;
+            writerSettings = new XmlWriterSettings();
+            writerSettings.Encoding = Encoding.UTF8;
             if (innerEnc == null)
                 throw new ArgumentNullException("innerEnc");
         }
+        public CertRefEncoder()
+        {
+            innerEncoder = (new TextMessageEncodingBindingElement()).CreateMessageEncoderFactory().Encoder;
 
+            writerSettings = new XmlWriterSettings();
+            writerSettings.Encoding = Encoding.UTF8;
+        }
 
         public override string ContentType
         {
-            get { return this.innerEncoder.ContentType; }
+            get { return innerEncoder?.ContentType; }
         }
 
         public override string MediaType
         {
-            get { return this.innerEncoder.MediaType; }
+            get { return innerEncoder?.MediaType; }
         }
 
         public override MessageVersion MessageVersion
         {
-            get { return this.innerEncoder.MessageVersion; }
+            get { return innerEncoder?.MessageVersion; }
         }
 
         public override Message ReadMessage(ArraySegment<byte> buffer, BufferManager bufferManager, string contentType)
@@ -72,10 +83,6 @@ namespace CertFixEscapedComma
                     msg.Headers.RemoveAt(secHeaderIndex);
                     var reader = msg.GetReaderAtBodyContents();
                     XmlNodeList encryptedKey = messageOriginal.DocumentElement.SelectNodes("//*[local-name()='EncryptedKey']");
-                    //Inyectarlo----------------------------------------------------------------------------
-
-                    #error Especificar la ubicación de los certificados
-                    X509Certificate2 certificado = new X509Certificate2(@".p12", "");
                     var rsa = certificado.PrivateKey as RSACryptoServiceProvider;
                     foreach (XmlNode nodo in encryptedKey)
                     {
@@ -88,15 +95,12 @@ namespace CertFixEscapedComma
                             XmlNode secNode = body.ReadNode(reader);
                             body.LoadXml(secNode.OuterXml);
                             var text = body.InnerText;
-                            ICifrado<byte[]> aes = new AES128Manejador()
-                            {
-                                Key = decodedData
-                            };
-                            byte[] descifrado = aes.descifrar(text);
+                            cypher.Key = decodedData;
+
+                            byte[] descifrado = cypher.descifrar(text);
                             String desencriptado = Encoding.UTF8.GetString(descifrado);
-                            //Extraño-----------------------------------
-                            //Inyectar ns-------------------------------
-                            desencriptado = desencriptado.Substring(desencriptado.IndexOf("<ns1"), desencriptado.Length - desencriptado.IndexOf("<ns1"));
+                            string prefix = getPrefix(desencriptado);
+                            desencriptado = desencriptado.Substring(desencriptado.IndexOf("<" + prefix), desencriptado.Length - desencriptado.IndexOf("<" + prefix));
                             msg = Message.CreateMessage(msg.Version, "", new SimpleMessageBody(desencriptado));
                         }
                     }
@@ -108,11 +112,33 @@ namespace CertFixEscapedComma
             }
             return msg;
         }
+        public string getPrefix(string desencriptado)
+        {
+            string prefix = "";
+            string _namespace = namespaces["valid"];
 
-        public override Message ReadMessage(System.IO.Stream stream, int maxSizeOfHeaders, string contentType)
+            if (!desencriptado.Contains(_namespace))
+            {
+                _namespace = namespaces["invalid"];
+                if (!desencriptado.Contains(_namespace))
+                    return "";
+            }
+
+            int final = desencriptado.IndexOf(_namespace) - 3;
+            char c = desencriptado[final];
+
+            while (c != ':')
+            {
+                prefix = c + prefix;
+                final--;
+                c = desencriptado[final];
+            }
+            return prefix;
+        }
+        public override Message ReadMessage(Stream stream, int maxSizeOfHeaders, string contentType)
         {
 
-            return innerEncoder.ReadMessage(stream, maxSizeOfHeaders, contentType);
+            return innerEncoder?.ReadMessage(stream, maxSizeOfHeaders, contentType);
         }
 
         private bool validateFirma(XmlDocument messageOriginal)
@@ -156,7 +182,7 @@ namespace CertFixEscapedComma
 
         public override void WriteMessage(Message message, System.IO.Stream stream)
         {
-            this.innerEncoder.WriteMessage(message, stream);
+            this.innerEncoder?.WriteMessage(message, stream);
         }
 
 

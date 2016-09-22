@@ -14,20 +14,21 @@ namespace CertFixEscapedComma
         {
         }
 
-        public CertRefEncodingBindingElement(MessageEncodingBindingElement innerEBE): this(innerEBE,null)
-        {
-        }
+        //public CertRefEncodingBindingElement(MessageEncodingBindingElement innerEBE) : this(innerEBE, null)
+        //{
+        //}
 
-        public CertRefEncodingBindingElement(MessageEncodingBindingElement innerEBE,MessageEncoder enc)
+        public CertRefEncodingBindingElement(MessageEncodingBindingElement innerEBE, MessageEncoder enc)
         {
-            this.innerMsgEncBindElmt = innerEBE;
-            this.innerMsgEncBindElmt.MessageVersion = MessageVersion.Soap11;
+            innerMsgEncBindElmt = innerEBE;
+            if (innerMsgEncBindElmt != null)
+                innerMsgEncBindElmt.MessageVersion = MessageVersion.Soap11;
             this.enc = enc;
         }
 
         public override MessageEncoderFactory CreateMessageEncoderFactory()
         {
-            CertRefEncoderFactory factory = new CertRefEncoderFactory(this.innerMsgEncBindElmt.CreateMessageEncoderFactory());
+            CertRefEncoderFactory factory = new CertRefEncoderFactory(innerMsgEncBindElmt.CreateMessageEncoderFactory(), enc);
             return factory;
         }
 
@@ -35,17 +36,22 @@ namespace CertFixEscapedComma
         {
             get
             {
-                return this.innerMsgEncBindElmt.MessageVersion;
+                return innerMsgEncBindElmt?.MessageVersion;
             }
             set
             {
-                this.innerMsgEncBindElmt.MessageVersion = value;
+                if (innerMsgEncBindElmt != null)
+                    innerMsgEncBindElmt.MessageVersion = value;
             }
         }
 
         public override BindingElement Clone()
         {
-            CertRefEncodingBindingElement newBE = new CertRefEncodingBindingElement((MessageEncodingBindingElement)((BindingElement)this.innerMsgEncBindElmt).Clone(), this.enc);
+            CertRefEncodingBindingElement newBE = null;
+            if (innerMsgEncBindElmt != null)
+                newBE = new CertRefEncodingBindingElement((MessageEncodingBindingElement)innerMsgEncBindElmt.Clone(), enc);
+            else
+                newBE = new CertRefEncodingBindingElement();
             return newBE;
         }
 

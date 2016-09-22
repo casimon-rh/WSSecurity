@@ -6,14 +6,18 @@ namespace CertFixEscapedComma
     public class CertRefEncoderFactory : MessageEncoderFactory
     {
         private MessageEncoderFactory innerFactory;
-        CertRefEncoder enc;
+        MessageEncoder enc;
 
-        public CertRefEncoderFactory(MessageEncoderFactory innerFactory)
+        public CertRefEncoderFactory(MessageEncoderFactory innerFactory, MessageEncoder _enc)
         {
             this.innerFactory = innerFactory;
             if (innerFactory == null)
                 throw new ArgumentNullException("innerFactory");
-            enc = new CertRefEncoder(innerFactory.Encoder);
+            enc = _enc;
+
+            if (enc != null)
+                enc.GetType().GetProperty("innerEncoder")?.SetValue(enc, innerFactory.Encoder);
+            //enc = new CertRefEncoder(innerFactory.Encoder);
         }
         public override MessageEncoder Encoder
         {
@@ -22,12 +26,12 @@ namespace CertFixEscapedComma
 
         public override MessageVersion MessageVersion
         {
-            get { return this.innerFactory.MessageVersion; }
+            get { return innerFactory?.MessageVersion; }
         }
 
         public override MessageEncoder CreateSessionEncoder()
         {
-            return this.enc;
+            return enc;
         }
     }
 }

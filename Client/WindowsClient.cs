@@ -22,8 +22,6 @@ namespace Client
 {
     public partial class WindowsClient : Form
     {
-        #error Especificar la ubicación de los certificados
-        static X509Certificate2 privateCer = new X509Certificate2(@".p12", "");
         public WindowsClient()
         {
             InitializeComponent();
@@ -48,7 +46,7 @@ namespace Client
             Assertion assertion = new Assertion();
             assertion.Id = "_" + Guid.NewGuid().ToString();
             assertion.IssueInstant = DateTime.UtcNow;
-            #error Especificar issuer
+#error Especificar issuer
             assertion.Issuer = new Issuer("www.example.mx", null, null, SamlNameIdentifierFormat.Entity, null);
             assertion.Conditions = new Conditions(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(5));
             assertion.Subject = new Subject(new NameId("DEAA9255")
@@ -78,11 +76,14 @@ namespace Client
 
         private void cmdGo_Click(object sender, EventArgs e)
         {
-            #error especificar url del endpoint
+#error especificar url del endpoint
             EndpointAddress adress = new EndpointAddress(new Uri("http://localhost"), EndpointIdentity.CreateDnsIdentity("jasper2"));
-            var factory = new ChannelFactory<FechasPortType>("BindingOSB", adress);
+
+
+            var factory = new ChannelFactory<FechasPortType>(Service.getCustomBinding(), adress);
 
             SamlAssertionClientCredentials saml = new SamlAssertionClientCredentials(new SamlAssertionInfo(CreateAssertion()));
+            X509Certificate2 privateCer = Service.getCertificate();
 
             factory.Endpoint.Behaviors.Remove<System.ServiceModel.Description.ClientCredentials>();
             factory.Endpoint.Behaviors.Add(saml);
