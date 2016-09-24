@@ -71,11 +71,18 @@ namespace CertFixEscapedComma
             bufferManager.ReturnBuffer(buffer.Array);
             MemoryStream stream = new MemoryStream(msgContents);
             Message msg = ReadMessage(stream, int.MaxValue);
+            if (msg.IsFault)
+                return Message.CreateMessage(msg.Version, MessageFault.CreateFault(msg, int.MaxValue), "");
             string accion = "";
             //return msg;
             XmlDocument messageOriginal = new XmlDocument();
             messageOriginal.PreserveWhitespace = true;
             messageOriginal.LoadXml(msg.ToString());
+
+
+            XmlNodeList encryptedKey = messageOriginal.DocumentElement.SelectNodes("//*[local-name()='EncryptedKey']");
+
+
             var reader = msg.GetReaderAtBodyContents();
             String desencriptado = "";
 
@@ -85,46 +92,54 @@ namespace CertFixEscapedComma
             XmlNode secNode = body.ReadNode(reader);
             body.LoadXml(secNode.OuterXml);
 
-            XmlNodeList encryptedKey = messageOriginal.DocumentElement.SelectNodes("//*[local-name()='EncryptedKey']");
-            var nodo = encryptedKey[0];
-            var encryptdData = nodo.SelectNodes("//*[local-name()='CipherData']");
-            if (encryptdData.Count >= 1)
+            XmlNode nodo = null;
+
+            if (encryptedKey.Count > 0)
             {
-                var rsa = certificado.PrivateKey as RSACryptoServiceProvider;
-                var decodedData = rsa.Decrypt(Convert.FromBase64String(encryptdData[0].InnerText), true);
-
-                var text = body.InnerText;
-                cypher.Key = decodedData;
-
-                byte[] descifrado = cypher.descifrar(text);
-                int start = 0, end = 0;
-                end = descifrado.Length;
-                if (end >= 3 && descifrado[0] == 0xEF && descifrado[1] == 0xBB && descifrado[2] == 0xBF)
+                nodo = encryptedKey[0];
+                var encryptdData = nodo.SelectNodes("//*[local-name()='CipherData']");
+                if (encryptdData.Count >= 1)
                 {
-                    start += 3;
-                    end -= 3;
-                    desencriptado = Encoding.UTF8.GetString(descifrado, start, end).Trim().Replace("\0", "");
+                    var rsa = certificado.PrivateKey as RSACryptoServiceProvider;
+                    var decodedData = rsa.Decrypt(Convert.FromBase64String(encryptdData[0].InnerText), true);
+
+                    var text = body.InnerText;
+                    cypher.Key = decodedData;
+
+                    byte[] descifrado = cypher.descifrar(text);
+                    int start = 0, end = 0;
+                    end = descifrado.Length;
+                    if (end >= 3 && descifrado[0] == 0xEF && descifrado[1] == 0xBB && descifrado[2] == 0xBF)
+                    {
+                        start += 3;
+                        end -= 3;
+                        desencriptado = Encoding.UTF8.GetString(descifrado, start, end).Trim().Replace("\0", "");
+                    }
+                    else
+                        desencriptado = Encoding.UTF8.GetString(descifrado, start, end).Trim().Replace("\0", "");
+                    //string prefix = getPrefix(desencriptado);
+                    int inicio = getInicio(desencriptado);
+                    int badchars = getBadCharCount(desencriptado);
+                    accion = getAction(inicio, desencriptado);
+                    desencriptado = desencriptado.Substring(inicio, desencriptado.Length - badchars - inicio);
                 }
-                else
-                    desencriptado = Encoding.UTF8.GetString(descifrado, start, end).Trim().Replace("\0", "");
-                //string prefix = getPrefix(desencriptado);
-                int inicio = getInicio(desencriptado);
-                int badchars = getBadCharCount(desencriptado);
-                accion = getAction(inicio, desencriptado);
-                desencriptado = desencriptado.Substring(inicio, desencriptado.Length - badchars - inicio);
+            }
+            else
+            {
+                desencriptado = secNode.OuterXml;
             }
 
 
-            XmlDocument otrobody = new XmlDocument();
-            otrobody.LoadXml(desencriptado);
-            XmlNode body2 = messageOriginal.ImportNode(otrobody.DocumentElement, true);
+            //XmlDocument otrobody = new XmlDocument();
+            //otrobody.LoadXml(desencriptado);
+            //XmlNode body2 = messageOriginal.ImportNode(otrobody.DocumentElement, true);
 
-            XmlNode body1 = messageOriginal.SelectNodes("//*[local-name()='Body']")[0];
-            XmlNode hijo = body1.FirstChild;
-            body1.RemoveChild(hijo);
-            body1.AppendChild(body2);
+            //XmlNode body1 = messageOriginal.SelectNodes("//*[local-name()='Body']")[0];
+            //XmlNode hijo = body1.FirstChild;
+            //body1.RemoveChild(hijo);
+            //body1.AppendChild(body2);
 
-            Verify(messageOriginal);//Debería ser un IF
+            //Verify(messageOriginal);//Debería ser un IF
             {
                 try
                 {
