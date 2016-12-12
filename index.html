@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Wssecurity by darknesstiller</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Wssecurity</h1>
+        <h2></h2>
+        <a href="https://github.com/darknesstiller/WSSecurity" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="wsecurity" class="anchor" href="#wsecurity" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>WSecurity</h1>
+
+<p>Implementación de <strong>Windows Communication Foundation</strong> para el consumo de Servicios Web asegurados en un <strong>Oracle Service Bus</strong></p>
+
+<h2>
+<a id="colaboradores" class="anchor" href="#colaboradores" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Colaboradores</h2>
+
+<ul>
+<li>Eneas Mejía</li>
+<li>Carlos Simón <g-emoji alias="grin" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f601.png" ios-version="6.0">😁</g-emoji>
+</li>
+<li>Jorge Ugalde</li>
+</ul>
+
+<h2>
+<a id="requisitos" class="anchor" href="#requisitos" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requisitos</h2>
+
+<ul>
+<li>Visual Studio 2013 o superior
+
+<ul>
+<li>Net Framework 4.5.1</li>
+</ul>
+</li>
+<li>Component Pro
+
+<ul>
+<li><a href="http://www.componentpro.com/saml.net/">Ultimate SAML</a></li>
+</ul>
+</li>
+<li>Certificados de prueba</li>
+</ul>
+
+<h2>
+<a id="consideraciones" class="anchor" href="#consideraciones" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Consideraciones</h2>
+
+<ul>
+<li>Especificar el <strong>issuer</strong> correcto en la ubicación marcada con un <strong>#error</strong>
+</li>
+</ul>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">private</span> Assertion CreateAssertion()
+{
+    <span class="pl-c">// Este se obtiene con el OAM</span>
+    Assertion assertion = <span class="pl-k">new</span> Assertion();
+    assertion.Id = <span class="pl-s"><span class="pl-pds">"</span>_<span class="pl-pds">"</span></span> + Guid.NewGuid().ToString();
+    assertion.IssueInstant = DateTime.UtcNow;
+    #error <span class="pl-en">Especificar issuer</span>
+    assertion.Issuer = <span class="pl-k">new</span> Issuer(<span class="pl-s"><span class="pl-pds">"</span>www.example.com.mx<span class="pl-pds">"</span></span>, <span class="pl-c1">null</span>, <span class="pl-c1">null</span>, SamlNameIdentifierFormat.Entity, <span class="pl-c1">null</span>);
+    assertion.Conditions = <span class="pl-k">new</span> Conditions(DateTime.UtcNow, DateTime.UtcNow.AddMinutes(<span class="pl-c1">5</span>));
+    assertion.Subject = <span class="pl-k">new</span> Subject(<span class="pl-k">new</span> NameId(<span class="pl-s"><span class="pl-pds">"</span>DEAA9255<span class="pl-pds">"</span></span>)
+    {
+        Format = <span class="pl-s"><span class="pl-pds">"</span>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified<span class="pl-pds">"</span></span>
+    })
+    {
+        SubjectConfirmations = <span class="pl-k">new</span> List&lt;SubjectConfirmation&gt;()
+        {
+            <span class="pl-k">new</span> SubjectConfirmation(<span class="pl-s"><span class="pl-pds">"</span>urn:oasis:names:tc:SAML:2.0:cm:sender-vouches<span class="pl-pds">"</span></span>)
+        }
+    };
+
+    <span class="pl-k">return</span> assertion;
+
+}
+</pre></div>
+
+<p>Especificar la <strong>url del endpoint</strong> en la ubicación marcada con un <strong>#error</strong></p>
+
+<div class="highlight highlight-source-cs"><pre><span class="pl-k">private</span> <span class="pl-k">void</span> cmdGo_Click(<span class="pl-k">object</span> sender, EventArgs e)
+{
+    #error <span class="pl-en">especificar url del endpoint</span>
+    EndpointAddress adress =
+        <span class="pl-k">new</span> EndpointAddress(<span class="pl-k">new</span> Uri(<span class="pl-s"><span class="pl-pds">"</span>http://192.168.0.1/testService<span class="pl-pds">"</span></span>), EndpointIdentity.CreateDnsIdentity(<span class="pl-s"><span class="pl-pds">"</span>jasper2<span class="pl-pds">"</span></span>));
+    <span class="pl-k">var</span> factory = <span class="pl-k">new</span> ChannelFactory&lt;FechasPortType&gt;(<span class="pl-s"><span class="pl-pds">"</span>BindingOSB<span class="pl-pds">"</span></span>, adress);
+    SamlAssertionClientCredentials saml = <span class="pl-k">new</span> SamlAssertionClientCredentials(<span class="pl-k">new</span> SamlAssertionInfo(CreateAssertion()));
+}</pre></div>
+
+<ul>
+<li>Especificar ruta del <strong>certificado</strong>  en el archivo <strong>App.Config</strong>
+</li>
+</ul>
+
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">object</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>System.Security.Cryptography.X509Certificates.X509Certificate2,System<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>Certificate<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">constructor-arg</span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>Ruta<span class="pl-pds">"</span></span> /&gt;
+    &lt;<span class="pl-ent">constructor-arg</span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>Contraseña<span class="pl-pds">"</span></span> /&gt;
+&lt;/<span class="pl-ent">object</span>&gt;
+</pre></div>
+
+<ul>
+<li>Especificar Namespaces del <strong>response</strong>  en el archivo <strong>App.Config</strong>
+</li>
+</ul>
+
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">object</span> <span class="pl-e">type</span>=<span class="pl-s"><span class="pl-pds">"</span>CertFixEscapedComma.CertRefEncoder,MySecurityBE<span class="pl-pds">"</span></span> <span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>Encoder<span class="pl-pds">"</span></span> <span class="pl-e">singleton</span>=<span class="pl-s"><span class="pl-pds">"</span>false<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>certificado<span class="pl-pds">"</span></span> <span class="pl-e">ref</span>=<span class="pl-s"><span class="pl-pds">"</span>Certificate<span class="pl-pds">"</span></span>/&gt;
+    &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>cypher<span class="pl-pds">"</span></span> <span class="pl-e">ref</span>=<span class="pl-s"><span class="pl-pds">"</span>Cypher<span class="pl-pds">"</span></span>/&gt;
+    &lt;<span class="pl-ent">property</span> <span class="pl-e">name</span>=<span class="pl-s"><span class="pl-pds">"</span>namespaces<span class="pl-pds">"</span></span>&gt;
+        &lt;<span class="pl-ent">dictionary</span> <span class="pl-e">key-type</span>=<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span> <span class="pl-e">value-type</span>=<span class="pl-s"><span class="pl-pds">"</span>string<span class="pl-pds">"</span></span>&gt;
+            &lt;<span class="pl-ent">entry</span> <span class="pl-e">key</span>=<span class="pl-s"><span class="pl-pds">"</span>valid<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>https://<span class="pl-pds">"</span></span>/&gt;
+            &lt;<span class="pl-ent">entry</span> <span class="pl-e">key</span>=<span class="pl-s"><span class="pl-pds">"</span>invalid<span class="pl-pds">"</span></span> <span class="pl-e">value</span>=<span class="pl-s"><span class="pl-pds">"</span>https://<span class="pl-pds">"</span></span>/&gt;
+        &lt;/<span class="pl-ent">dictionary</span>&gt;
+    &lt;/<span class="pl-ent">property</span>&gt;
+&lt;/<span class="pl-ent">object</span>&gt;
+</pre></div>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/darknesstiller/WSSecurity/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/darknesstiller/WSSecurity/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/darknesstiller/WSSecurity"></a> is maintained by <a href="https://github.com/darknesstiller">darknesstiller</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
